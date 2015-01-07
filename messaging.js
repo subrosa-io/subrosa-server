@@ -408,6 +408,10 @@ function onComm(conn, data){
 		var currentTime = new Date().getTime();
 		var emitObject = {sender: conn.uid, target: data.target, type: data.type, data: data.data, auxdata: data.auxdata, time: currentTime};
 		
+		if(data.clientTs){
+			// send ACK with server timestamp
+			conn.msg("ack", {sTs: currentTime, cTs: data.clientTs, target: data.target});
+		}
 		
 		if(data.type == 1){
 			// Key exchange
@@ -429,11 +433,6 @@ function onComm(conn, data){
 				commBuffer[data.target] = [];
 				commBufferCondition[data.target] = false; 
 			});
-		} else if(data.type == 2){
-			// send ACK with server timestamp
-			if(data.clientTs){ // no clientTs means it's an edit, don't send an ack for that
-				conn.msg("ack", {sTs: currentTime, cTs: data.clientTs, target: data.target});
-			}
 		} else if(data.type == 5 && data.target.length == 37){
 			// Contact request / accept
 			db.redis.hget("contacts:" + data.target.substr(4), "requester", function(err, res){
