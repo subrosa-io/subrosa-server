@@ -24,6 +24,8 @@ wss.on("connection", function(conn){
 	conn.heartbeat = true;
 	connections.push(conn);
 	conn.on("message", function(message){
+		if(conn.ignored)
+			return;
 		if(message.length>0){
 			if(message[0] == "{"){
 				try {

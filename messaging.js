@@ -419,9 +419,14 @@ function onComm(conn, data){
 				return;
 			emitNow = false;
 			commBufferCondition[data.target] = true;
-			if(!commBuffer[data.target]){
-				commBuffer[data.target] = [];
+			
+			// detect key negotiation race condition
+			if(typeof commBuffer[data.target] != "undefined"){
+				conn.ignored = true;
+				return conn.msg("reloadNeeded", {raceCondition: data.target});
 			}
+			
+			commBuffer[data.target] = [];
 			// Send keyExchange sender's public key
 			db.sqlQuery("SELECT publicKey FROM users WHERE uid='" + conn.uid + "'", function(err, rows){
 				emitObject.pubKey = rows[0].publicKey;
