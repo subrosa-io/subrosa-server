@@ -18,7 +18,7 @@ var setConnProto = false;
 
 wss.on("connection", function(conn){
 	if(!setConnProto){
-		conn.constructor.prototype.msg = function(type, message){ if(this.readyState == this.OPEN){ message.sockType=type; this.send(JSON.stringify(message)) } }; 
+		conn.constructor.prototype.msg = function(type, message){ if(this.readyState == this.OPEN){ message.sockType=type; this.send(JSON.stringify(message)) } };
 		setConnProto=true;
 	}
 	conn.heartbeat = true;
@@ -52,11 +52,11 @@ wss.on("connection", function(conn){
 		connections.splice(connections.indexOf(conn), 1);
 		if(conn.uid){
 			db.redis.hset("user:" + conn.uid, "online",  0);
-			
+
 			var uR = module.exports.userRoomSockets[conn.uid];
 			var rS = module.exports.roomSockets;
 			var gCI = module.exports.groupCallInfo;
-			
+
 			for(var i in uR){ // for every room I'm in
 				if(rS[uR[i]] && rS[uR[i]].indexOf(conn.uid) !== -1){
 					rS[uR[i]].splice(rS[uR[i]].indexOf(conn.uid), 1); // remove from the room socket list
@@ -66,15 +66,15 @@ wss.on("connection", function(conn){
 					module.exports.emitTo(rS[uR[i]], "", "statusUpdate", {target: conn.uid, status: 0}); // send offline (parsed by clients as exiting group call)
 				}
 			}
-			
+
 			uR = [];
-			
+
 			for(var i in module.exports.lastList[conn.uid]){
 				if(uidConn[module.exports.lastList[conn.uid][i]]){ // send offline to contacts
 					uidConn[module.exports.lastList[conn.uid][i]].msg("statusUpdate", {target: conn.uid, status: 0});
 				}
 			}
-			
+
 			uidConn[conn.uid] = null;
 		}
 	});
@@ -100,7 +100,7 @@ setInterval(function(){
 			return true;
 		});
 	}, 20 * 1000);
-}, 40 * 1000);
+}, 20 * 1000);
 
 var lastVersionCheck = -1;
 var lastVersionData = "";
@@ -216,7 +216,7 @@ function createExports(){
 		var selecting = false;
 		var currentObj = [];
 		var currentItem = "";
-		
+
 		for(var i = 0; i < il; i++){
 			if(!selecting){
 				if(input[i] == "&" && (i == 0 || input[i-1] != "!")){
