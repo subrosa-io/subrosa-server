@@ -87,7 +87,6 @@ setInterval(function(){
 			try {
 				connections[i].send("*"); // send hearbeat
 			} catch (error) {
-				console.log(error);
 			}
 		}
 	}
