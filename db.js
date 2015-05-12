@@ -5,7 +5,7 @@ var sql = mysql.createPool({
     host: config.db.host,
     user: config.db.user,
     password: config.db.password,
-    socketPath: '/var/run/mysqld/mysqld.sock',
+    socketPath: config.db.unix_socket,
     database: config.db.database,
     connectionLimit: 50,
     multipleStatements: true,
